@@ -1,6 +1,6 @@
 variable "name" {
   description = "The name of the VPC"
-  type = string
+  type        = string
 }
 
 variable "cidr_block" {
@@ -22,20 +22,20 @@ variable "default_tags" {
 variable "public_subnets" {
   type = list(object({
     cidr = string
-    az = string
+    az   = string
   }))
 }
 
 variable "private_subnets" {
   type = list(object({
     cidr = string
-    az = string
+    az   = string
   }))
 }
 
 
 variable "attach_igw" {
-  type = bool
+  type    = bool
   default = true
 }
 

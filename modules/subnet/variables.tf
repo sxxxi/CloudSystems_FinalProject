@@ -9,7 +9,7 @@ variable "vpc_id" {
 variable "subnets" {
   type = list(object({
     cidr = string
-    az = string
+    az   = string
   }))
 }
 
