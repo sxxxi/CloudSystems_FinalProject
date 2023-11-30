@@ -27,24 +27,21 @@ module "fp_private_subnets" {
 
 resource "aws_internet_gateway" "fp_igw" {
   vpc_id = aws_vpc.fp_vpc.id
-  count  = var.attach_igw ? 1 : 0
   tags = merge(var.default_tags, tomap({
-    Name = "${var.name}-igw" # No need to put a number because only 1 gateway can be created
+    Name = "${var.name}-igw"
   }))
 }
 
 resource "aws_eip" "fp_nat_eip" {
-  count = length(var.nat_subnet_ids)
   tags = merge(var.default_tags, tomap({
-    Name = "${var.name}-eip-${count.index + 1}"
+    Name = "${var.name}-eip"
   }))
 }
 
 resource "aws_nat_gateway" "fp_nat" {
-  count         = length(aws_eip.fp_nat_eip)
-  subnet_id     = var.nat_subnet_ids[count.index]
-  allocation_id = aws_eip.fp_nat_eip[count.index].id
+  subnet_id     = var.nat_subnet_id
+  allocation_id = aws_eip.fp_nat_eip.id
   tags = merge(var.default_tags, tomap({
-    Name = "${var.name}-nat-${count.index + 1}"
+    Name = "${var.name}-nat"
   }))
 }

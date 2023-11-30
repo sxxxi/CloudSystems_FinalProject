@@ -2,7 +2,7 @@ output "vpc_id" {
   value = aws_vpc.fp_vpc.id
 }
 
-output "nats" {
+output "nat" {
   value = aws_nat_gateway.fp_nat
 }
 
