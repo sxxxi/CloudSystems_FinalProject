@@ -22,7 +22,7 @@ module "vm_ssh_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = var.vpc_cidr
+      cidr_blocks = "0.0.0.0/0"
     }
   ]
   egress_rules = ["all-all"]
@@ -37,7 +37,13 @@ module "vm_http_sg" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_blocks = var.vpc_cidr
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = "0.0.0.0/0"
     },
     {
       from_port = -1

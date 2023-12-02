@@ -49,5 +49,7 @@ locals {
 
 
   instance_ami = "ami-0230bd60aa48260c6"
+  key_name = "vockey"
+  instance_type = "t2.micro"
 
 }

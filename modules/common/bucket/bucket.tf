@@ -1,6 +1,8 @@
 resource "aws_s3_bucket" "media_bucket" {
-  bucket = "media-bucket-991617069"
+  bucket = var.name
   force_destroy = true
+
+  tags = merge(var.default_tags)
 }
 
 ## WHY DOES IT NOT WORK!

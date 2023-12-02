@@ -40,8 +40,9 @@ resource "aws_route_table" "fp_shared_private_rt_2" {
 # EXPERIMENT: attach to subnet 2 and ping google from private subnet
 # Associate PUBLIC SUBNET ROUTE TABLE to BASTION SUBNET
 resource "aws_route_table_association" "fp_shared_public_rt_association" {
+  count = length(var.public_subnet_ids)
   route_table_id = aws_route_table.fp_shared_public_rt.id
-  subnet_id      = var.public_subnet_ids[0]
+  subnet_id      = var.public_subnet_ids[count.index]
 }
 
 # SHARED VPC PRIVATE ROUTE TABLE ASSOCIATION

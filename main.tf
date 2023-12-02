@@ -97,19 +97,89 @@ resource "aws_route" "dev_private_to_shared_private_route" {
 }
 
 ###########################################################################################################
+#########################################  S3  ############################################################
 ###########################################################################################################
 
-
-# S3
 module "fp_s3" {
   source = "./modules/common/bucket"
+  name = "media-bucket-991617069"
+  default_tags = var.default_tags
+}
+
+###########################################################################################################
+########################################  Instances  ######################################################
+###########################################################################################################
+
+# DevVPC Bastion
+resource "aws_instance" "fp_dev_bastion" {
+  ami           = local.instance_ami
+  instance_type = local.instance_type
+  subnet_id                   = module.fp_dev_vpc.public_subnets[0].id
+  associate_public_ip_address = true
+  key_name                    = local.key_name
+  security_groups = module.fp_dev_vpc.bastion_sg_ids
+  tags = merge(var.default_tags, tomap({
+    Name = "${local.dev_vpc_name}-Bastion"
+  }))
+}
+
+# DevVPC VM
+resource "aws_instance" "fp_dev_vms" {
+  count         = length(module.fp_dev_vpc.private_subnets[*].id)
+  ami           = local.instance_ami
+  instance_type = local.instance_type
+  subnet_id     = module.fp_dev_vpc.private_subnets[count.index].id
+  key_name      = local.key_name
+  security_groups = module.fp_dev_vpc.vm_sg_ids
+  tags = merge(var.default_tags, tomap({
+    Name = "${local.dev_vpc_name}-VM${count.index + 1}"
+  }))
+}
+
+# SharedVPC Bastion
+resource "aws_instance" "fp_shared_bastion" {
+  ami           = local.instance_ami
+  instance_type = local.instance_type
+  subnet_id                   = module.fp_shared_vpc.public_subnets[0].id
+  associate_public_ip_address = true
+  key_name                    = local.key_name
+  security_groups = module.fp_shared_vpc.bastion_sg_ids
+  tags = merge(var.default_tags, tomap({
+    Name = "${local.shared_vpc_name}-Bastion"
+  }))
+}
+
+# SharedVPC VM2
+resource "aws_instance" "fp_shared_v1" {
+  ami           = local.instance_ami
+  instance_type = local.instance_type
+  subnet_id     = module.fp_shared_vpc.private_subnets[1].id
+  key_name      = local.key_name
+  security_groups = module.fp_shared_vpc.vm_sg_ids
+  tags = merge(var.default_tags, tomap({
+    Name = "${local.shared_vpc_name}-VM2"
+  }))
 }
 
 
+# Attach instance profile to access S3
+resource "aws_iam_instance_profile" "lab_profile" {
+  name = "lab_profile"
+  role = "LabRole"
+}
 
-
-
-
+# SharedVPC VM1
+resource "aws_instance" "fp_shared_vm1" {
+  ami           = local.instance_ami
+  instance_type = local.instance_type
+  subnet_id     = module.fp_shared_vpc.private_subnets[0].id
+  key_name      = local.key_name
+  iam_instance_profile = aws_iam_instance_profile.lab_profile.name
+  security_groups = module.fp_shared_vpc.vm_sg_ids
+  tags = merge(var.default_tags, tomap({
+    Name = "${local.shared_vpc_name}-VM1"
+  }))
+}
 
 
 

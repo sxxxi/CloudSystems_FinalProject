@@ -28,24 +28,3 @@ module "security_groups" {
   vpc_name = var.vpc_name
   vpc_cidr = var.vpc_cidr
 }
-
-module "instances" {
-  source = "./instances"
-  shared_vpc_name = var.vpc_name
-  instance_type = "t2.micro"
-  key_name = "vockey"   # Assuming all instances share the same instance type and key
-
-  bastion_sg_ids = [
-    module.security_groups.bastion_ssh_sg_id
-  ]
-  bastion_subnet_id = module.vpc.public_subnets[0].id
-
-  # Create an instance for each subnet ID
-  private_subnet_ids = module.vpc.private_subnets[*].id
-  vm_sg_ids = [
-    module.security_groups.vm_ssh_sg_id,
-    module.security_groups.vm_http_sg_id
-  ]
-
-  default_tags = var.default_tags
-}
